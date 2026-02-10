@@ -279,6 +279,27 @@ def main():
             with tc3:
                 st.radio("Dinner", ["eaten", "skipped"], key="track_dinner", horizontal=True)
 
+            st.subheader("How did you feel?")
+            st.caption("Optional: help personalize the next plan.")
+            if "fb_hunger" not in st.session_state:
+                st.session_state["fb_hunger"] = 5
+            if "fb_energy" not in st.session_state:
+                st.session_state["fb_energy"] = 6
+            if "fb_weight_change" not in st.session_state:
+                st.session_state["fb_weight_change"] = 0.0
+            if "fb_suggestions" not in st.session_state:
+                st.session_state["fb_suggestions"] = ""
+
+            fc1, fc2, fc3 = st.columns(3)
+            with fc1:
+                st.slider("Hunger (1–10)", min_value=1, max_value=10, value=st.session_state["fb_hunger"], key="fb_hunger")
+            with fc2:
+                st.slider("Energy (1–10)", min_value=1, max_value=10, value=st.session_state["fb_energy"], key="fb_energy")
+            with fc3:
+                st.number_input("Weight change (kg)", value=float(st.session_state["fb_weight_change"]), step=0.1, key="fb_weight_change")
+
+            st.text_input("Suggestions (optional)", key="fb_suggestions", placeholder="e.g. lighter lunch, more protein")
+
             if st.button("Generate next plan (with feedback)"):
                 if payload.get("age", 0) < 1 or payload.get("height", 0) <= 0 or payload.get("weight", 0) <= 0:
                     st.error("Please set valid Age, Height, and Weight in the sidebar.")
@@ -286,11 +307,15 @@ def main():
                     try:
                         feedback = {
                             "yesterday_plan": last_plan,
+                            "hunger": st.session_state.get("fb_hunger"),
+                            "energy": st.session_state.get("fb_energy"),
+                            "weight_change": st.session_state.get("fb_weight_change"),
                             "meal_feedback": {
                                 "breakfast": st.session_state["track_breakfast"],
                                 "lunch": st.session_state["track_lunch"],
                                 "dinner": st.session_state["track_dinner"],
                             },
+                            "suggestions": (st.session_state.get("fb_suggestions") or "").strip() or None,
                         }
                         r = fetch_plan_with_feedback(payload, feedback)
                         if r.status_code == 200:

@@ -89,22 +89,26 @@ class FeedbackAgent:
             if not dish:
                 continue
 
+            # Like/dislike preference
             if response == "like":
                 adj["prefer_foods"].append(dish)
-
             elif response == "dislike":
                 adj["avoid_foods"].append(dish)
+
+            # Tracking: skipped / not_eaten -> avoid suggesting same dish again
+            if response in ("skipped", "not_eaten"):
+                if dish not in adj["avoid_foods"]:
+                    adj["avoid_foods"].append(dish)
 
     def _process_suggestions(self, adj: Dict):
         """
         Very simple keyword-based interpretation.
         No LLM yet (safe & deterministic).
         """
-        text = self.feedback.get("suggestions", "")
-        text = text.lower()
-
+        text = self.feedback.get("suggestions")
         if not text:
             return
+        text = text.lower()
 
         if "lighter lunch" in text or "light lunch" in text:
             adj["meal_strategy"]["lunch"] = "lighter"

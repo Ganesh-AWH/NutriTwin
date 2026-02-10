@@ -1,4 +1,3 @@
-from groq import Groq
 import os
 
 
@@ -9,12 +8,20 @@ class LlamaLoader:
     """
 
     def __init__(self, model_name="llama-3.1-8b-instant"):
-        self.client = Groq(
-            api_key=os.getenv("GROQ_API_KEY")
-        )
+        api_key = os.getenv("GROQ_API_KEY")
+        self.client = None
+        if api_key:
+            try:
+                from groq import Groq
+                self.client = Groq(api_key=api_key)
+            except Exception:
+                # Fall back to no-op if Groq is unavailable
+                self.client = None
         self.model = model_name
 
     def generate(self, prompt: str) -> str:
+        if not self.client:
+            return ""
         response = self.client.chat.completions.create(
             model=self.model,
             messages=[

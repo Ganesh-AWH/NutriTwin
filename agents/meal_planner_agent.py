@@ -42,9 +42,15 @@ def classify_meal_type(dish_name: str) -> str:
 # DAILY MEAL PLANNER
 # =========================
 class DailyMealPlanner:
-    def __init__(self, user_profile: Dict, feedback_adjustments: Dict = None):
+    def __init__(
+        self,
+        user_profile: Dict,
+        feedback_adjustments: Dict = None,
+        week_used_dishes: set = None,
+    ):
         self.profile = user_profile
         self.adjustments = feedback_adjustments or {}
+        self.week_used_dishes = week_used_dishes or set()
 
         # Base targets
         self.daily_calories = (
@@ -154,10 +160,14 @@ class DailyMealPlanner:
             if self._preference_score(food):
                 score += 15
 
-            # 4️⃣ Soft diversity penalty (KEY FEATURE)
+            # 4️⃣ Soft diversity penalty within day
             if meal_index > 0:
                 if food["dish_name"].lower() in used_dishes:
                     score -= 50
+
+            # 5️⃣ Strong penalty for dishes already used this week (weekly variety)
+            if food["dish_name"].lower() in self.week_used_dishes:
+                score -= 150
 
             return score
 

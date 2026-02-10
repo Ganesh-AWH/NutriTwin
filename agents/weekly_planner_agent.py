@@ -23,9 +23,11 @@ class WeeklyMealPlanner:
         feedback = None
 
         for day in range(1, 8):
+            # Pass dishes already used on previous days so this day picks different ones
             planner = DailyMealPlanner(
                 self.user_profile,
-                feedback_adjustments=feedback
+                feedback_adjustments=feedback,
+                week_used_dishes=set(self.used_dishes),
             )
 
             day_plan = planner.generate_day_plan()

@@ -34,6 +34,12 @@ class FeedbackInput(BaseModel):
     suggestions: Optional[str] = None
 
 
+class PlanFeedbackRequest(BaseModel):
+    """Single body for POST /plan/feedback: user profile + feedback."""
+    user_input: UserInput
+    feedback: FeedbackInput
+
+
 # ---------- RESPONSES ----------
 
 class PlanResponse(BaseModel):

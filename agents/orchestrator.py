@@ -22,11 +22,15 @@ class NutritionOrchestrator:
         planner = DailyMealPlanner(profile, adjustments)
         plan = planner.generate_day_plan()
 
-        explanation = self.explainer.explain_day_plan(
-            user_profile=profile,
-            day_plan=plan,
-            feedback_adjustments=feedback
-        )
+        try:
+            explanation = self.explainer.explain_day_plan(
+                user_profile=profile,
+                day_plan=plan,
+                feedback_adjustments=feedback
+            )
+        except Exception:
+            # Never fail the API if the explainer fails
+            explanation = ""
 
         return {
             "profile": profile,

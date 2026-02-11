@@ -9,7 +9,7 @@ import requests
 import streamlit as st
 
 # ---------- CONSTANTS ----------
-BASE_URL = "http://127.0.0.1:8000"
+BASE_URL = "http://127.0.0.1:8001"
 API_TIMEOUT = 60
 
 
